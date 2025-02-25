@@ -1,17 +1,22 @@
-#include<windows.h>
-#include<iostream>
+#include<stdio.h>
+#include<unistd.h>
+#include<sys/types.h>
 int main()
 {
-    STARTUPINFO si={sizeof(si)};
-    PROCESS_INFORMATION pi;
-    if(!CreateProcess(NULL,(LPSTR)"C:\\Windows\\System32\\notepad.exe",
-                      NULL,NULL,FALSE,0,NULL,NULL,&si,&pi)) {
-        std::cout<<"Process creation failed.\n";
+    pid_t pid;
+    pid=fork();
+    if(pid<0)
+    {
+        perror("Fork failed");
         return 1;
     }
-    std::cout<<"Parent process.\n";
-    std::cout<<"Child PID: "<<pi.dwProcessId<<std::endl;
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
+    else if(pid==0)
+    {
+        printf("Child Process: PID = %d, Parent PID = %d\n",getpid(),getppid());
+    }
+    else
+    {
+        printf("Parent Process: PID = %d, Child PID = %d\n",getpid(),pid);
+    }
     return 0;
 }
